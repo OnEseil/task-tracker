@@ -1,0 +1,19 @@
+spring:
+  mail:
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    host: smtp.gmail.com
+    port: 587
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  kafka:
+    bootstrap-servers: kafka:9092
+
+emailFromSend: ${MAIL_USERNAME}
+
+server:
+  port: 8081

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1772028744504-1" author="oneseil">
+        <createTable tableName="tasks">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tasks"/>
+            </column>
+            <column name="task_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1772028744504-2" author="oneseil">
+        <createTable tableName="tokens">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tokens"/>
+            </column>
+            <column name="access_token" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="refresh_token" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expired" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1772028744504-3" author="oneseil">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1772028744504-4" author="oneseil">
+        <addUniqueConstraint columnNames="email" constraintName="uc_users_email" tableName="users"/>
+    </changeSet>
+    <changeSet id="1772028744504-5" author="oneseil">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="tasks" constraintName="FK_TASKS_ON_USER"
+                                 referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1772028744504-6" author="oneseil">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="tokens" constraintName="FK_TOKENS_ON_USER"
+                                 referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: task-tracker
+
+  profiles:
+    active: docker
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP-SERVERS}
+    admin:
+      auto-create: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+topic: "EMAIL_VERIFYING"
+
+jwt:
+  secret: ${JWT_SECRET}
+  accessExpiration: ${JWT_ACCESS_EXPIRATION}
+  refreshExpiration: ${JWT_REFRESH_EXPIRATION}

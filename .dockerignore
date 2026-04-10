@@ -1,0 +1,10 @@
+# Example .dockerignore file
+.git
+.venv
+node_modules
+build
+dist
+temp/
+# Exclude local volume data if you are accidentally copying it
+postgres_data/
+*.log

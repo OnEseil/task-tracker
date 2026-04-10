@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: "myuser"
+    password: "mypass"
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+
+jwt:
+  accessExpiration: 2000000
+  refreshExpiration: 88000000
+  secret: "thTM5iFZgTnlMMVG4jTw40uKU96mJaIL8i33AhRpMJ0sF12eMBqfkQ=="
