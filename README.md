@@ -10,11 +10,11 @@
 - Kafka
 - CI/CD, GitHub Actions
 
-## Для запуска приложения необходимо указать в файле application-docker.yaml в сервисе task-tracker-mail
-- username: ""
-- password: ""
-- emailFromSend: ""
-
+## Для запуска приложения необходимо создать файл .env и на основе .env.example заполнить:
+- MAIL_USERNAME=
+- MAIL_PASSWORD=
+  
+обязательные поля, остальные нет
 
 ## Для запуска необходимо в директории, где находится docker-compose-local.yaml прописать команду:
 `docker compose -f  docker-compose-local.yaml up -d`
