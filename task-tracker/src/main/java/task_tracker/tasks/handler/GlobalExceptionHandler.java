@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException.*;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpClientErrorException.Forbidden;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 import task_tracker.tasks.entity.ExceptionClass;
 import task_tracker.tasks.exception.EmailAlreadyExistsException;
 
@@ -20,8 +20,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionClass> handleEmailExceptions() {
         return new ResponseEntity<>(new ExceptionClass("Этот email уже существует!"), HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionClass> handleBadRequest(){
+    public ResponseEntity<ExceptionClass> handleBadRequest() {
         return new ResponseEntity<>(new ExceptionClass("Неверный запрос!"), HttpStatus.BAD_REQUEST);
     }
 
@@ -31,13 +32,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Unauthorized.class)
-    public ResponseEntity<ExceptionClass> handUnauthorized(){
+    public ResponseEntity<ExceptionClass> handUnauthorized() {
         return new ResponseEntity<>(new ExceptionClass("В заголовке отсутствует токен или он неправильный!")
                 , HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Forbidden.class)
-    public ResponseEntity<ExceptionClass> handleForbidden(){
+    public ResponseEntity<ExceptionClass> handleForbidden() {
         return new ResponseEntity<>(new ExceptionClass("У пользователя недостаточно прав для доступа к этой странице!")
                 , HttpStatus.FORBIDDEN);
     }

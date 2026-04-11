@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import task_tracker.tasks.entity.Status;
 
-
 import java.time.LocalDate;
 
 public record TaskDTO(

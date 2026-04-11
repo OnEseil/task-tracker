@@ -15,6 +15,7 @@ import task_tracker.tasks.dto.TaskCreateDTO;
 import task_tracker.tasks.dto.TaskDTO;
 import task_tracker.tasks.dto.TaskPatchUpdateDTO;
 import task_tracker.tasks.entity.Task;
+import task_tracker.tasks.mapper.TaskMapper;
 import task_tracker.tasks.repository.TaskRepository;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final TaskMapper taskMapper;
 
     @Transactional(readOnly = true)
     public List<TaskDTO> findByUserEmail(String email) {
@@ -37,7 +39,7 @@ public class TaskService {
         log.info("Возвращено задач для пользователя | email={} | count={}", email, tasks.size());
 
         return tasks.stream()
-                .map(task -> new TaskDTO(task.getId() ,task.getTaskName(), task.getStatus(), task.getDescription(), task.getCompletedAt()))
+                .map(taskMapper::toDto)
                 .toList();
     }
 
@@ -50,20 +52,13 @@ public class TaskService {
                     return new UsernameNotFoundException("Пользователь не найден");
                 });
 
-        Task task = Task.builder()
-                .taskName(taskDTO.taskName())
-                .status(taskDTO.status())
-                .description(taskDTO.description())
-                .completedAt(taskDTO.completedAt())
-                .user(user)
-                .build();
-
+        Task task = taskMapper.toEntity(taskDTO, user);
         task = taskRepository.save(task);
 
         log.info("Задача успешно создана | id={} | email={} | taskName={}",
                 task.getId(), email, task.getTaskName());
 
-        return new TaskDTO(task.getId(),task.getTaskName(), task.getStatus(), task.getDescription(), task.getCompletedAt());
+        return taskMapper.toDto(task);
     }
 
     public TaskDTO partialUpdate(Long id, UserDetails userDetails, TaskPatchUpdateDTO updateDTO) {
@@ -75,10 +70,7 @@ public class TaskService {
                     return new ResourceNotFoundException("Такой задачи нет!");
                 });
 
-        if (!task.getUser().getEmail().equals(userDetails.getUsername())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    , "Такой задачи не существует или вы пытаетесь изменить чужую задачу!");
-        }
+        validateTaskOwner(task, userDetails);
 
         updateDTO.taskName().ifPresent(task::setTaskName);
         updateDTO.description().ifPresent(task::setDescription);
@@ -89,7 +81,7 @@ public class TaskService {
 
         log.info("Задача частично обновлена | id={} | taskName={}", id, task.getTaskName());
 
-        return new TaskDTO(task.getId(), task.getTaskName(), task.getStatus(), task.getDescription(), task.getCompletedAt());
+        return taskMapper.toDto(task);
     }
 
     public TaskDTO fullUpdate(Long id, UserDetails userDetails, TaskCreateDTO taskDTO) {
@@ -101,10 +93,7 @@ public class TaskService {
                     return new ResourceNotFoundException("Такой задачи нет!");
                 });
 
-        if (!task.getUser().getEmail().equals(userDetails.getUsername())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    , "Такой задачи не существует или вы пытаетесь изменить чужую задачу!");
-        }
+        validateTaskOwner(task, userDetails);
 
         task.setTaskName(taskDTO.taskName());
         task.setDescription(taskDTO.description());
@@ -116,7 +105,7 @@ public class TaskService {
         log.info("Задача полностью обновлена | id={} | taskName={} | status={}",
                 id, task.getTaskName(), task.getStatus());
 
-        return new TaskDTO(task.getId(), task.getTaskName(), task.getStatus(), task.getDescription(), task.getCompletedAt());
+        return taskMapper.toDto(task);
     }
 
     public void delete(Long id, UserDetails userDetails) {
@@ -128,13 +117,19 @@ public class TaskService {
                     return new ResourceNotFoundException("Такой задачи нет!");
                 });
 
-        if (!task.getUser().getEmail().equals(userDetails.getUsername())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    , "Такой задачи не существует или вы пытаетесь изменить чужую задачу!");
-        }
+        validateTaskOwner(task, userDetails);
 
         taskRepository.delete(task);
 
         log.info("Задача успешно удалена | id={} | taskName={}", id, task.getTaskName());
+    }
+
+    private void validateTaskOwner(Task task, UserDetails userDetails) {
+        if (!task.getUser().getEmail().equals(userDetails.getUsername())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Такой задачи не существует или вы пытаетесь изменить чужую задачу!"
+            );
+        }
     }
 }

@@ -25,4 +25,5 @@ public record TaskCreateDTO(
 
         @NotNull(message = "поле completedAt должно быть обязательно!")
         LocalDate completedAt
-) {}
+) {
+}

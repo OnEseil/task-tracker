@@ -9,13 +9,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import task_tracker.auth.dto.TokensDTO;
 import task_tracker.auth.dto.LoginRequest;
 import task_tracker.auth.dto.RegisterRequest;
+import task_tracker.auth.dto.TokensDTO;
 import task_tracker.auth.dto.UserDTO;
 import task_tracker.auth.entity.Role;
 import task_tracker.auth.entity.Token;
 import task_tracker.auth.entity.User;
+import task_tracker.auth.mapper.UserMapper;
 import task_tracker.auth.repository.TokenRepository;
 import task_tracker.auth.repository.UserRepository;
 import task_tracker.auth.util.JwtUtil;
@@ -32,11 +33,13 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
+    private final UserMapper userMapper;
 
-    public UserDTO findUserByEmail(String email){
+    public UserDTO findUserByEmail(String email) {
         User user = userRepository.findUserByEmail(email);
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        return userMapper.toDto(user);
     }
+
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -85,7 +88,7 @@ public class UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("Верификация не удалась — пользователь не найден | email={}", email);
+                    log.warn("Верификация не удалась: пользователь не найден | email={}", email);
                     return new UsernameNotFoundException("Пользователь с такой почтой не найден: " + email);
                 });
 
@@ -114,14 +117,14 @@ public class UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("Неудачная попытка входа — пользователь не найден | email={}", email);
+                    log.warn("Неудачная попытка входа: пользователь не найден | email={}", email);
                     return new UsernameNotFoundException("Пользователь с такой почтой не найден: " + email);
                 });
 
         boolean passwordMatches = passwordEncoder.matches(loginRequest.password(), user.getPassword());
 
         if (!passwordMatches) {
-            log.warn("Неудачная попытка входа — неверный пароль | email={}", email);
+            log.warn("Неудачная попытка входа: неверный пароль | email={}", email);
             throw new BadCredentialsException("Логин или пароль не совпадают!");
         }
 
@@ -149,9 +152,8 @@ public class UserService {
         return new TokensDTO(newToken.getAccessToken(), newToken.getRefreshToken());
     }
 
-    public TokensDTO refreshToken(HttpServletRequest httpServletRequest){
+    public TokensDTO refreshToken(HttpServletRequest httpServletRequest) {
         String token = jwtUtil.extractToken(httpServletRequest);
-
         String email = jwtUtil.extractUsername(token);
 
         User user = userRepository.findByEmail(email)
@@ -179,13 +181,12 @@ public class UserService {
 
     public void logout(HttpServletRequest httpServletRequest) {
         String token = jwtUtil.extractToken(httpServletRequest);
-
         String email = jwtUtil.extractUsername(token);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found"));
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        userDetailsService.loadUserByUsername(email);
 
         Token oldToken = tokenRepository.findTokenByUserId(user.getId());
 

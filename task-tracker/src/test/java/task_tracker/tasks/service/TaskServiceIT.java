@@ -15,6 +15,7 @@ import task_tracker.auth.service.UserService;
 import task_tracker.tasks.dto.TaskDTO;
 import task_tracker.tasks.entity.Status;
 import task_tracker.tasks.entity.Task;
+import task_tracker.tasks.mapper.TaskMapper;
 import task_tracker.tasks.repository.TaskRepository;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 @DataJpaTest
-@Import(TaskService.class)
+@Import({TaskService.class, TaskMapper.class})
 public class TaskServiceIT {
     @Autowired
     private TaskService taskService;

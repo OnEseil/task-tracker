@@ -1,15 +1,14 @@
 package task_tracker.auth.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -161,7 +160,7 @@ public class AuthController {
     @Operation(summary = "Обновление токенов пользователя")
     public ResponseEntity<?> refreshToken(
             HttpServletRequest httpServletRequest
-    ){
+    ) {
         return ResponseEntity.ok(userService.refreshToken(httpServletRequest));
     }
 
@@ -169,7 +168,7 @@ public class AuthController {
     @Operation(summary = "Выход из системы")
     public ResponseEntity<?> logout(
             HttpServletRequest httpServletRequest
-    ){
+    ) {
         userService.logout(httpServletRequest);
         return ResponseEntity.ok("успешно!");
     }
